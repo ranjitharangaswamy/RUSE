@@ -1,4 +1,4 @@
-# RUSE - Seattle Youth Connector Copilot
+# RUSEAi Real-time Updates on Seattle Events
 
 RUSE is an intelligent, AI-powered platform that discovers, curates, and matches Seattle-area youth programs and activities with appropriate age groups while reducing manual maintenance overhead.
 
