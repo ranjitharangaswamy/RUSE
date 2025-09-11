@@ -1,0 +1,773 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Heart, 
+  X, 
+  MapPin, 
+  Calendar, 
+  Users, 
+  Clock, 
+  Phone, 
+  Mail, 
+  ExternalLink,
+  Filter,
+  Search,
+  Settings,
+  Shield,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Zap,
+  Globe,
+  BookOpen,
+  Briefcase,
+  Activity,
+  Award,
+  UserCheck,
+  AlertTriangle,
+  CheckCircle,
+  RefreshCw,
+  TrendingUp,
+  Eye,
+  MessageCircle,
+  Share2
+} from 'lucide-react';
+
+const RUSEYouthPlatform = () => {
+  const [currentCard, setCurrentCard] = useState(0);
+  const [userAge, setUserAge] = useState(16);
+  const [userInterests, setUserInterests] = useState(['Career', 'Mental Health']);
+  const [matchedPrograms, setMatchedPrograms] = useState([]);
+  const [likedPrograms, setLikedPrograms] = useState([]);
+  const [dislikedPrograms, setDislikedPrograms] = useState([]);
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [safetyMode, setSafetyMode] = useState(true);
+  const [currentView, setCurrentView] = useState('discover');
+  const [isLoading, setIsLoading] = useState(false);
+  const [sparkPrograms, setSparkPrograms] = useState([]);
+  
+  const cardRef = useRef(null);
+
+  // Enhanced program data from Seattle resources with AI-powered categorization
+  const seattlePrograms = [
+    {
+      id: 1,
+      title: "Seattle Youth Employment Program",
+      organization: "City of Seattle",
+      description: "Paid work experience and career development opportunities for Seattle youth ages 16-24. Gain valuable job skills while earning money and building your professional network.",
+      category: "Career Exploration and Jobs",
+      ageRange: "16-24",
+      location: "Various Seattle locations",
+      schedule: "Summer and year-round positions",
+      contactPhone: "(206) 684-0440",
+      contactEmail: "syep@seattle.gov",
+      url: "https://www.seattle.gov/human-services/services-and-programs/youth-and-young-adults/seattle-youth-employment-program",
+      safetyVerified: true,
+      trending: true,
+      matchScore: 95,
+      tags: ["paid", "career", "networking", "professional"],
+      requirements: ["Ages 16-24", "Seattle resident preferred", "Application required"],
+      benefits: ["Paid position", "Career mentorship", "Professional development"],
+      image: "/api/placeholder/400/300",
+      socialProof: "487 youth participated last year",
+      aiInsight: "Perfect match for career-focused youth looking for real work experience"
+    },
+    {
+      id: 2,
+      title: "Fire Cadet Program",
+      organization: "Seattle Fire Department",
+      description: "Learn firefighting basics, emergency medical training, and community service while exploring a career in public safety. Ages 15 and up.",
+      category: "Career Exploration and Jobs",
+      ageRange: "15+",
+      location: "Fire Station 10, Seattle",
+      schedule: "Wednesdays 6:30-9:00 PM",
+      contactPhone: "(206) 386-1400",
+      contactEmail: "fire.cadets@seattle.gov",
+      url: "https://www.seattle.gov/fire/jobs-and-opportunities/cadet-program",
+      safetyVerified: true,
+      trending: false,
+      matchScore: 88,
+      tags: ["leadership", "emergency", "community service", "training"],
+      requirements: ["Age 15+", "Background check", "Physical fitness"],
+      benefits: ["Leadership training", "Emergency skills", "College credit available"],
+      image: "/api/placeholder/400/300",
+      socialProof: "92% of cadets report increased confidence",
+      aiInsight: "Great for youth interested in public safety and emergency services"
+    },
+    {
+      id: 3,
+      title: "Seattle Mental Health First Aid",
+      organization: "Reach Out Seattle",
+      description: "Learn how to identify and respond to mental health challenges in yourself and peers. Safe, supportive environment with trained counselors.",
+      category: "Mental Health and Wellness",
+      ageRange: "13-21",
+      location: "Multiple community centers",
+      schedule: "Monthly workshops, various times",
+      contactPhone: "(206) 684-7073",
+      contactEmail: "mentalhealth@seattle.gov",
+      url: "https://www.seattle.gov/mayor/one-seattle-initiatives/youth-mental-health",
+      safetyVerified: true,
+      trending: true,
+      matchScore: 92,
+      tags: ["mental health", "peer support", "wellness", "counseling"],
+      requirements: ["Ages 13-21", "Parental consent if under 18"],
+      benefits: ["Mental health resources", "Peer support network", "Professional guidance"],
+      image: "/api/placeholder/400/300",
+      socialProof: "98% of participants feel more equipped to help others",
+      aiInsight: "Essential program for building emotional intelligence and peer support skills"
+    },
+    {
+      id: 4,
+      title: "Teen Library Leadership Program",
+      organization: "Seattle Public Library",
+      description: "Develop leadership skills while helping younger students with reading and homework. Great for college applications and community service hours.",
+      category: "Community Service",
+      ageRange: "14-18",
+      location: "Seattle Public Library branches",
+      schedule: "Flexible, 2-4 hours per week",
+      contactPhone: "(206) 386-4636",
+      contactEmail: "teens@spl.org",
+      url: "https://www.spl.org/programs-and-services/learning/student-success",
+      safetyVerified: true,
+      trending: false,
+      matchScore: 85,
+      tags: ["leadership", "tutoring", "community service", "college prep"],
+      requirements: ["Ages 14-18", "Good academic standing", "Commitment to program"],
+      benefits: ["Leadership experience", "Community service hours", "College recommendation"],
+      image: "/api/placeholder/400/300",
+      socialProof: "89% of participants get accepted to their first-choice college",
+      aiInsight: "Perfect for students looking to build leadership skills and give back"
+    },
+    {
+      id: 5,
+      title: "Seattle Parks Lifeguard Training",
+      organization: "Seattle Parks and Recreation",
+      description: "Get certified as a lifeguard and earn money working at Seattle pools and beaches. Comprehensive water safety and rescue training included.",
+      category: "Career Exploration and Jobs",
+      ageRange: "15+",
+      location: "Seattle Aquatic Centers",
+      schedule: "Training: 2 weeks intensive, Work: Summer",
+      contactPhone: "(206) 684-4075",
+      contactEmail: "aquatics@seattle.gov",
+      url: "https://www.seattle.gov/parks/about-us/jobs/aquatics-employment-and-training",
+      safetyVerified: true,
+      trending: true,
+      matchScore: 78,
+      tags: ["water safety", "certification", "summer job", "fitness"],
+      requirements: ["Age 15+", "Strong swimming skills", "CPR certification"],
+      benefits: ["Professional certification", "Summer employment", "Water safety skills"],
+      image: "/api/placeholder/400/300",
+      socialProof: "156 new lifeguards certified annually",
+      aiInsight: "Great summer opportunity combining fitness, safety skills, and employment"
+    },
+    {
+      id: 6,
+      title: "Youth Transportation Ambassadors",
+      organization: "Seattle Department of Transportation",
+      description: "Learn about urban planning and transportation while advocating for youth needs in Seattle's transit system. Leadership and civic engagement opportunity.",
+      category: "Civic Engagement",
+      ageRange: "14-24",
+      location: "Seattle Municipal Tower and field sites",
+      schedule: "Monthly meetings plus events",
+      contactPhone: "(206) 684-7623",
+      contactEmail: "youth.programs@seattle.gov",
+      url: "https://www.seattle.gov/transportation/projects-and-programs/programs/transportation-access-programs/youth-ambassadors",
+      safetyVerified: true,
+      trending: false,
+      matchScore: 82,
+      tags: ["civic engagement", "urban planning", "advocacy", "leadership"],
+      requirements: ["Ages 14-24", "Interest in transportation/urban planning"],
+      benefits: ["Civic leadership experience", "Urban planning knowledge", "Policy influence"],
+      image: "/api/placeholder/400/300",
+      socialProof: "Youth advocates influenced 3 major transportation policies",
+      aiInsight: "Perfect for civically-minded youth interested in urban planning and policy"
+    }
+  ];
+
+  useEffect(() => {
+    // Simulate AI matching and data refresh
+    const matchPrograms = () => {
+      setIsLoading(true);
+      const filtered = seattlePrograms.filter(program => {
+        const ageMatch = checkAgeEligibility(program.ageRange, userAge);
+        const safetyCheck = program.safetyVerified;
+        return ageMatch && safetyCheck;
+      });
+      
+      // AI-powered sorting by match score and user interests
+      const sorted = filtered.sort((a, b) => {
+        const aInterestMatch = userInterests.some(interest => 
+          a.category.toLowerCase().includes(interest.toLowerCase()) ||
+          a.tags.some(tag => tag.toLowerCase().includes(interest.toLowerCase()))
+        );
+        const bInterestMatch = userInterests.some(interest => 
+          b.category.toLowerCase().includes(interest.toLowerCase()) ||
+          b.tags.some(tag => tag.toLowerCase().includes(interest.toLowerCase()))
+        );
+        
+        if (aInterestMatch && !bInterestMatch) return -1;
+        if (!aInterestMatch && bInterestMatch) return 1;
+        return b.matchScore - a.matchScore;
+      });
+      
+      setMatchedPrograms(sorted);
+      setSparkPrograms(sorted.filter(p => p.trending));
+      setIsLoading(false);
+    };
+
+    if (!showOnboarding) {
+      matchPrograms();
+    }
+  }, [userAge, userInterests, showOnboarding]);
+
+  const checkAgeEligibility = (ageRange, userAge) => {
+    if (ageRange.includes('+')) {
+      const minAge = parseInt(ageRange.replace('+', ''));
+      return userAge >= minAge;
+    }
+    if (ageRange.includes('-')) {
+      const [min, max] = ageRange.split('-').map(n => parseInt(n));
+      return userAge >= min && userAge <= max;
+    }
+    return true;
+  };
+
+  const handleSwipe = (direction) => {
+    const currentProgram = matchedPrograms[currentCard];
+    if (!currentProgram) return;
+
+    if (direction === 'right') {
+      setLikedPrograms([...likedPrograms, currentProgram]);
+    } else {
+      setDislikedPrograms([...dislikedPrograms, currentProgram]);
+    }
+    
+    setCurrentCard(currentCard + 1);
+  };
+
+  const resetStack = () => {
+    setCurrentCard(0);
+    setLikedPrograms([]);
+    setDislikedPrograms([]);
+  };
+
+  const completeOnboarding = () => {
+    setShowOnboarding(false);
+  };
+
+  // Onboarding Component
+  const OnboardingFlow = () => {
+    const [step, setStep] = useState(1);
+    const [tempAge, setTempAge] = useState(16);
+    const [tempInterests, setTempInterests] = useState([]);
+
+    const interests = [
+      'Career Exploration', 'Mental Health', 'Community Service', 'Arts & Culture',
+      'Sports & Fitness', 'Technology', 'Leadership', 'Academic Support',
+      'Civic Engagement', 'Environmental', 'Entrepreneurship', 'Social Activities'
+    ];
+
+    const toggleInterest = (interest) => {
+      if (tempInterests.includes(interest)) {
+        setTempInterests(tempInterests.filter(i => i !== interest));
+      } else {
+        setTempInterests([...tempInterests, interest]);
+      }
+    };
+
+    const finishOnboarding = () => {
+      setUserAge(tempAge);
+      setUserInterests(tempInterests);
+      completeOnboarding();
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
+          <div className="text-center mb-8">
+            <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-3 rounded-2xl inline-block mb-4">
+              <Zap className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to RUSE</h1>
+            <p className="text-gray-600">Discover amazing youth programs in Seattle</p>
+          </div>
+
+          {step === 1 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">How old are you?</h2>
+              <div className="space-y-4">
+                <input
+                  type="range"
+                  min="13"
+                  max="24"
+                  value={tempAge}
+                  onChange={(e) => setTempAge(parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="text-center">
+                  <span className="text-3xl font-bold text-purple-600">{tempAge}</span>
+                  <span className="text-gray-600 ml-2">years old</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setStep(2)}
+                className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-blue-600 transition-all"
+              >
+                Next
+              </button>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">What interests you?</h2>
+              <p className="text-gray-600 text-sm">Select as many as you like</p>
+              <div className="grid grid-cols-2 gap-3">
+                {interests.map(interest => (
+                  <button
+                    key={interest}
+                    onClick={() => toggleInterest(interest)}
+                    className={`p-3 rounded-xl text-sm font-medium transition-all ${
+                      tempInterests.includes(interest)
+                        ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {interest}
+                  </button>
+                ))}
+              </div>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setStep(1)}
+                  className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={finishOnboarding}
+                  disabled={tempInterests.length === 0}
+                  className="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Get Started
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Program Card Component
+  const ProgramCard = ({ program, isTop = false }) => {
+    const getCategoryIcon = (category) => {
+      switch (category) {
+        case 'Career Exploration and Jobs': return <Briefcase className="w-5 h-5" />;
+        case 'Mental Health and Wellness': return <Activity className="w-5 h-5" />;
+        case 'Community Service': return <Heart className="w-5 h-5" />;
+        case 'Civic Engagement': return <Users className="w-5 h-5" />;
+        default: return <Star className="w-5 h-5" />;
+      }
+    };
+
+    return (
+      <div className={`absolute inset-4 bg-white rounded-3xl shadow-2xl ${isTop ? 'z-20' : 'z-10 scale-95 opacity-60'}`}>
+        <div className="relative h-full flex flex-col">
+          {/* Image Header */}
+          <div className="h-48 bg-gradient-to-br from-purple-400 via-blue-400 to-indigo-400 rounded-t-3xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+            <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+              <div className="flex space-x-2">
+                {program.trending && (
+                  <span className="bg-gradient-to-r from-orange-400 to-red-400 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center">
+                    <TrendingUp className="w-3 h-3 mr-1" />
+                    Trending
+                  </span>
+                )}
+                {program.safetyVerified && (
+                  <span className="bg-green-500 text-white p-1.5 rounded-full">
+                    <Shield className="w-3 h-3" />
+                  </span>
+                )}
+              </div>
+              <div className="bg-white bg-opacity-20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-bold">
+                {program.matchScore}% match
+              </div>
+            </div>
+            <div className="absolute bottom-4 left-4 right-4">
+              <div className="flex items-center space-x-2 text-white mb-2">
+                {getCategoryIcon(program.category)}
+                <span className="text-sm font-medium">{program.category}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{program.title}</h3>
+            <p className="text-gray-600 text-sm mb-4">{program.description}</p>
+
+            <div className="space-y-3 mb-4">
+              <div className="flex items-center space-x-3 text-sm text-gray-600">
+                <Users className="w-4 h-4 text-purple-500" />
+                <span>Ages {program.ageRange}</span>
+              </div>
+              <div className="flex items-center space-x-3 text-sm text-gray-600">
+                <MapPin className="w-4 h-4 text-blue-500" />
+                <span>{program.location}</span>
+              </div>
+              <div className="flex items-center space-x-3 text-sm text-gray-600">
+                <Calendar className="w-4 h-4 text-green-500" />
+                <span>{program.schedule}</span>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <h4 className="font-semibold text-gray-900 mb-2">Benefits:</h4>
+              <ul className="space-y-1">
+                {program.benefits.map((benefit, idx) => (
+                  <li key={idx} className="flex items-center space-x-2 text-sm text-gray-600">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {program.aiInsight && (
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-3 rounded-xl mb-4">
+                <div className="flex items-start space-x-2">
+                  <Zap className="w-4 h-4 text-purple-500 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-purple-700 mb-1">AI Insight</p>
+                    <p className="text-xs text-purple-600">{program.aiInsight}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span>{program.socialProof}</span>
+              <span className="flex items-center space-x-1">
+                <UserCheck className="w-3 h-3" />
+                <span>Verified</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="p-6 pt-0">
+            <div className="flex justify-center space-x-6">
+              <button
+                onClick={() => handleSwipe('left')}
+                className="bg-gray-100 hover:bg-gray-200 p-4 rounded-full transition-all duration-200 hover:scale-110"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+              <button
+                onClick={() => window.open(program.url, '_blank')}
+                className="bg-blue-100 hover:bg-blue-200 p-4 rounded-full transition-all duration-200 hover:scale-110"
+              >
+                <ExternalLink className="w-6 h-6 text-blue-600" />
+              </button>
+              <button
+                onClick={() => handleSwipe('right')}
+                className="bg-gradient-to-r from-pink-400 to-red-400 hover:from-pink-500 hover:to-red-500 p-4 rounded-full transition-all duration-200 hover:scale-110"
+              >
+                <Heart className="w-6 h-6 text-white" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Main App Views
+  const DiscoverView = () => {
+    if (currentCard >= matchedPrograms.length) {
+      return (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center p-8">
+            <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-4 rounded-2xl inline-block mb-4">
+              <CheckCircle className="w-12 h-12 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">All caught up!</h2>
+            <p className="text-gray-600 mb-6">You've seen all available programs. Check your liked programs or refresh for new opportunities.</p>
+            <button
+              onClick={resetStack}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-blue-600 transition-all"
+            >
+              <RefreshCw className="w-4 h-4 mr-2 inline" />
+              See Programs Again
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex-1 relative">
+        {matchedPrograms.slice(currentCard, currentCard + 2).map((program, index) => (
+          <ProgramCard
+            key={program.id}
+            program={program}
+            isTop={index === 0}
+          />
+        ))}
+        
+        {isLoading && (
+          <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-30">
+            <div className="text-center">
+              <RefreshCw className="w-8 h-8 text-purple-500 animate-spin mx-auto mb-2" />
+              <p className="text-gray-600">Finding perfect matches...</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const LikedView = () => (
+    <div className="flex-1 overflow-y-auto p-4">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Programs You Liked</h2>
+      {likedPrograms.length === 0 ? (
+        <div className="text-center py-12">
+          <Heart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600">No liked programs yet. Start swiping to find your favorites!</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {likedPrograms.map(program => (
+            <div key={program.id} className="bg-white rounded-xl shadow-lg p-4 border border-gray-100">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-semibold text-gray-900">{program.title}</h3>
+                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                  {program.matchScore}% match
+                </span>
+              </div>
+              <p className="text-gray-600 text-sm mb-3">{program.description}</p>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-4 text-xs text-gray-500">
+                  <span>Ages {program.ageRange}</span>
+                  <span>{program.organization}</span>
+                </div>
+                <button
+                  onClick={() => window.open(program.url, '_blank')}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors"
+                >
+                  Apply Now
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const SparkView = () => (
+    <div className="flex-1 overflow-y-auto p-4">
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">Trending Programs</h2>
+      <p className="text-gray-600 mb-6">Hot opportunities other youth are loving right now</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {sparkPrograms.map(program => (
+          <div key={program.id} className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-4 border border-purple-100">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="font-semibold text-gray-900">{program.title}</h3>
+              <TrendingUp className="w-5 h-5 text-orange-500" />
+            </div>
+            <p className="text-gray-600 text-sm mb-3">{program.aiInsight}</p>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-purple-600 font-medium">{program.socialProof}</span>
+              <button
+                onClick={() => window.open(program.url, '_blank')}
+                className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded-lg text-xs hover:from-purple-600 hover:to-blue-600 transition-all"
+              >
+                Learn More
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const AllEventsView = () => (
+    <div className="flex-1 overflow-y-auto p-4">
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">All Youth Programs</h2>
+      <p className="text-gray-600 mb-6">Complete list of available programs in Seattle</p>
+      
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Program Name</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Organization</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Location</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Schedule</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Age Group</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Category</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {seattlePrograms.map((program, index) => (
+                <tr key={program.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-purple-50 transition-colors`}>
+                  <td className="px-4 py-4">
+                    <div className="flex items-center space-x-2">
+                      <div>
+                        <h3 className="font-semibold text-gray-900 text-sm">{program.title}</h3>
+                        {program.trending && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                            <TrendingUp className="w-3 h-3 mr-1" />
+                            Trending
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-600">{program.organization}</td>
+                  <td className="px-4 py-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      <MapPin className="w-3 h-3 text-blue-500" />
+                      <span>{program.location}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="w-3 h-3 text-green-500" />
+                      <span>{program.schedule}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      <Users className="w-3 h-3 text-purple-500" />
+                      <span>{program.ageRange}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-600">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {program.category}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => window.open(program.url, '_blank')}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center space-x-1"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Visit</span>
+                      </button>
+                      {program.contactPhone && (
+                        <button
+                          onClick={() => window.open(`tel:${program.contactPhone}`, '_self')}
+                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center space-x-1"
+                        >
+                          <Phone className="w-3 h-3" />
+                          <span>Call</span>
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div className="mt-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <Shield className="w-5 h-5 text-green-500" />
+          <h3 className="font-semibold text-gray-900">Safety Information</h3>
+        </div>
+        <p className="text-sm text-gray-600">
+          All programs listed are verified by the City of Seattle and partner organizations. 
+          Look for the <Shield className="w-3 h-3 inline text-green-500" /> shield icon for safety-verified programs.
+        </p>
+      </div>
+    </div>
+  );
+
+  if (showOnboarding) {
+    return <OnboardingFlow />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100">
+      {/* Header */}
+      <div className="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-md mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-2 rounded-xl">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">RUSE</h1>
+                <p className="text-xs text-gray-600">Age {userAge} • {userInterests.join(', ')}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              {safetyMode && (
+                <div className="bg-green-100 p-1 rounded-full">
+                  <Shield className="w-4 h-4 text-green-600" />
+                </div>
+              )}
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <Settings className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-md mx-auto h-screen flex flex-col">
+        {currentView === 'discover' && <DiscoverView />}
+        {currentView === 'events' && <AllEventsView />}
+        {currentView === 'liked' && <LikedView />}
+        {currentView === 'spark' && <SparkView />}
+
+        {/* Bottom Navigation */}
+        <div className="bg-white/90 backdrop-blur-md border-t border-gray-200 p-4">
+          <div className="flex justify-center space-x-6">
+            <button
+              onClick={() => setCurrentView('discover')}
+              className={`flex flex-col items-center space-y-1 ${currentView === 'discover' ? 'text-purple-600' : 'text-gray-400'}`}
+            >
+              <Globe className="w-5 h-5" />
+              <span className="text-xs">Discover</span>
+            </button>
+            <button
+              onClick={() => setCurrentView('events')}
+              className={`flex flex-col items-center space-y-1 ${currentView === 'events' ? 'text-purple-600' : 'text-gray-400'}`}
+            >
+              <Calendar className="w-5 h-5" />
+              <span className="text-xs">All Events</span>
+            </button>
+            <button
+              onClick={() => setCurrentView('spark')}
+              className={`flex flex-col items-center space-y-1 ${currentView === 'spark' ? 'text-purple-600' : 'text-gray-400'}`}
+            >
+              <TrendingUp className="w-5 h-5" />
+              <span className="text-xs">Trending</span>
+            </button>
+            <button
+              onClick={() => setCurrentView('liked')}
+              className={`flex flex-col items-center space-y-1 ${currentView === 'liked' ? 'text-purple-600' : 'text-gray-400'}`}
+            >
+              <Heart className="w-5 h-5" />
+              <span className="text-xs">Liked</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RUSEYouthPlatform;
