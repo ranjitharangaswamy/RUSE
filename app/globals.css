@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  body {
+    @apply bg-white text-gray-900;
+  }
+}
+
+@layer components {
+  .swipe-card {
+    @apply relative w-full max-w-sm mx-auto bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+  }
+  
+  .swipe-card.swiping {
+    @apply scale-105;
+  }
+  
+  .swipe-card.swiped-left {
+    @apply -rotate-12 -translate-x-full opacity-0;
+  }
+  
+  .swipe-card.swiped-right {
+    @apply rotate-12 translate-x-full opacity-0;
+  }
+  
+  .age-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .age-badge.early-childhood {
+    @apply bg-pink-100 text-pink-800;
+  }
+  
+  .age-badge.elementary {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .age-badge.teen {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .age-badge.young-adult {
+    @apply bg-purple-100 text-purple-800;
+  }
+}
