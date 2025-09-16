@@ -1,5 +1,6 @@
 # RUSE Real-time Updates on Seattle Events
 RUSE was built as a part of the Youth Connector Hackathon, Seattle, Washington organized by City of Seattle and AI2 Incubator. We were placed 2nd in the hackathon for this project!
+Try it out here: https://ruse-seattle.vercel.app/
 
 TL/DR: RUSE is an intelligent, AI-powered platform that discovers, curates, and matches Seattle-area youth programs and activities with appropriate age groups while reducing manual maintenance overhead.
 
